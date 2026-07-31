@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-NIDS — Live Detection Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0e17;
+    --bg2: #111827;
+    --bg3: #1a2332;
+    --border: #2d3a4f;
+    --text: #e0e6ed;
+    --text2: #8899aa;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --blue: #3b82f6;
+    --cyan: #06b6d4;
+    --purple: #a855f7;
+    --orange: #f97316;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Consolas', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--cyan);
+    letter-spacing: 1px;
+  }
+  .header .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: pulse 1.5s infinite;
+  }
+  .status-dot.connected { background: var(--green); }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Grid Layout */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    gap: 12px;
+    padding: 12px;
+    min-height: calc(100vh - 52px);
+  }
+
+  /* Stat Cards Row */
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+  .stat-card .sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  /* Panels */
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 10px 14px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--cyan);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+  }
+
+  /* Detection Feed */
+  .feed-panel { grid-column: 1 / 3; grid-row: 2 / 4; }
+  .feed-entry {
+    display: grid;
+    grid-template-columns: 50px 1fr 100px 80px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    transition: background 0.2s;
+  }
+  .feed-entry:hover { background: var(--bg3); }
+  .feed-entry.attack { border-left: 3px solid var(--red); }
+  .feed-entry.benign { border-left: 3px solid var(--green); }
+  .feed-entry.wrong { background: rgba(239,68,68,0.08); }
+  .feed-entry .sid { color: var(--text2); font-size: 11px; }
+  .feed-entry .pred {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .feed-entry .conf { color: var(--text2); text-align: right; }
+  .feed-entry .verdict {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .verdict.correct { background: rgba(34,197,94,0.2); color: var(--green); }
+  .verdict.wrong { background: rgba(239,68,68,0.2); color: var(--red); }
+
+  /* Attack Distribution */
+  .attack-panel { grid-column: 3 / 5; grid-row: 2; }
+  .bar-chart { padding: 8px 14px; }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .bar-label {
+    width: 140px;
+    text-align: right;
+    padding-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text2);
+  }
+  .bar-track {
+    flex: 1;
+    height: 18px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    min-width: 2px;
+  }
+  .bar-count {
+    width: 50px;
+    text-align: right;
+    padding-left: 8px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  /* Confusion Matrix */
+  .matrix-panel { grid-column: 3 / 5; grid-row: 3; }
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr;
+    grid-template-rows: auto 1fr 1fr;
+    gap: 4px;
+    padding: 16px;
+    height: 100%;
+    align-items: center;
+    justify-items: center;
+  }
+  .matrix-cell {
+    width: 100%;
+    text-align: center;
+    padding: 16px 8px;
+    border-radius: 6px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .matrix-label {
+    font-size: 11px;
+    color: var(--text2);
+    text-transform: uppercase;
+  }
+  .cell-tp { background: rgba(34,197,94,0.15); color: var(--green); }
+  .cell-fp { background: rgba(239,68,68,0.15); color: var(--red); }
+  .cell-fn { background: rgba(234,179,8,0.15); color: var(--yellow); }
+  .cell-tn { background: rgba(59,130,246,0.15); color: var(--blue); }
+
+  /* Latest Alert Detail */
+  .alert-detail {
+    grid-column: 3 / 5;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0;
+    display: none;
+  }
+  .alert-detail.visible { display: block; }
+
+  /* Threat Intelligence Panel */
+  .intel-panel { grid-column: 1 / 5; grid-row: 4; }
+  .intel-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text2);
+    font-size: 13px;
+  }
+  .intel-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr 1fr;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+  .intel-section h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text2);
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+  }
+  .intel-section ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .intel-section li {
+    padding: 2px 0;
+    color: var(--text);
+  }
+  .intel-section li::before {
+    content: "› ";
+    color: var(--cyan);
+  }
+  .intel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .intel-attack {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--orange);
+  }
+  .severity-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .sev-CRITICAL { background: rgba(190,18,60,0.25); color: #fb7185; border: 1px solid #be123c; }
+  .sev-HIGH     { background: rgba(239,68,68,0.20); color: #fca5a5; border: 1px solid #ef4444; }
+  .sev-MEDIUM   { background: rgba(234,179,8,0.20); color: #fde047; border: 1px solid #eab308; }
+  .sev-LOW      { background: rgba(34,197,94,0.20); color: #86efac; border: 1px solid #22c55e; }
+  .sev-UNKNOWN  { background: rgba(136,153,170,0.20); color: var(--text2); border: 1px solid var(--text2); }
+  .fp-LOW       { background: rgba(34,197,94,0.15); color: var(--green); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+  .fp-MEDIUM    { background: rgba(234,179,8,0.15); color: var(--yellow); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+  .fp-HIGH      { background: rgba(239,68,68,0.15); color: var(--red); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+  .fp-UNKNOWN   { background: rgba(136,153,170,0.15); color: var(--text2); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+  .intel-desc {
+    grid-column: 1 / 4;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+    padding: 6px 10px;
+    background: var(--bg);
+    border-radius: 4px;
+    border-left: 3px solid var(--cyan);
+  }
+  .intel-tag {
+    display: inline-block;
+    background: var(--bg);
+    color: var(--text2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    margin: 2px 4px 2px 0;
+    border: 1px solid var(--border);
+  }
+  .groq-block {
+    grid-column: 1 / 4;
+    background: rgba(168,85,247,0.06);
+    border-left: 3px solid var(--purple);
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .groq-block .groq-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--purple);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto auto auto;
+      height: auto;
+    }
+    .feed-panel { grid-column: 1 / 3; grid-row: 3; min-height: 400px; }
+    .attack-panel { grid-column: 1 / 3; }
+    .matrix-panel { grid-column: 1 / 3; }
+    .intel-panel { grid-column: 1 / 3; }
+    .intel-grid { grid-template-columns: 1fr; }
+    .intel-section[style*="grid-column"] { grid-column: 1 !important; }
+    .intel-desc { grid-column: 1 !important; }
+    .groq-block { grid-column: 1 !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI-NIDS &mdash; LIVE DETECTION DASHBOARD</h1>
+  <div class="status">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Connecting...</span>
+    <span style="margin-left:16px; color:var(--text2)" id="sessionRate">0 sess/s</span>
+  </div>
+</div>
+
+<div class="grid">
+  <!-- Row 1: Stat Cards -->
+  <div class="stat-card">
+    <div class="label">Sessions Analyzed</div>
+    <div class="value" id="totalSessions" style="color:var(--cyan)">0</div>
+    <div class="sub" id="totalFlows">0 flows</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Detection Accuracy</div>
+    <div class="value" id="accuracy" style="color:var(--green)">--</div>
+    <div class="sub">(TP + TN) / Total</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Detection Rate</div>
+    <div class="value" id="detectionRate" style="color:var(--yellow)">--</div>
+    <div class="sub">TP / (TP + FN)</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">False Positive Rate</div>
+    <div class="value" id="fpRate" style="color:var(--red)">--</div>
+    <div class="sub">FP / (FP + TN)</div>
+  </div>
+
+  <!-- Detection Feed -->
+  <div class="panel feed-panel">
+    <div class="panel-header">
+      <span>Live Detection Feed</span>
+      <span id="feedCount" style="color:var(--text2); font-weight:400">0 events</span>
+    </div>
+    <div class="panel-body" id="feedBody"></div>
+  </div>
+
+  <!-- Attack Distribution -->
+  <div class="panel attack-panel">
+    <div class="panel-header">
+      <span>Attack Distribution</span>
+      <span id="attackTotal" style="color:var(--text2); font-weight:400">0 attacks</span>
+    </div>
+    <div class="panel-body bar-chart" id="barChart"></div>
+  </div>
+
+  <!-- Confusion Matrix -->
+  <div class="panel matrix-panel">
+    <div class="panel-header">Binary Confusion Matrix (Attack vs Benign)</div>
+    <div class="panel-body">
+      <div class="matrix-grid">
+        <div></div>
+        <div class="matrix-label">Pred Attack</div>
+        <div class="matrix-label">Pred Benign</div>
+        <div class="matrix-label" style="text-align:right">Actual Attack</div>
+        <div class="matrix-cell cell-tp" id="cellTP">0</div>
+        <div class="matrix-cell cell-fn" id="cellFN">0</div>
+        <div class="matrix-label" style="text-align:right">Actual Benign</div>
+        <div class="matrix-cell cell-fp" id="cellFP">0</div>
+        <div class="matrix-cell cell-tn" id="cellTN">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Threat Intelligence Panel -->
+  <div class="panel intel-panel">
+    <div class="panel-header">
+      <span>Threat Intelligence — Latest Alert</span>
+      <span id="intelMeta" style="color:var(--text2); font-weight:400">awaiting first attack</span>
+    </div>
+    <div class="panel-body" id="intelBody">
+      <div class="intel-empty">
+        Waiting for an attack detection. RAG context (MITRE ATT&CK + IoCs) and Groq LLM
+        analysis will appear here as soon as the streaming engine flags a non-benign session.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const WS_URL = `ws://${location.hostname || 'localhost'}:8765`;
+const MAX_FEED_ENTRIES = 200;
+const ATTACK_COLORS = {
+  'DDoS': '#ef4444',
+  'DoS Hulk': '#f97316',
+  'DoS GoldenEye': '#eab308',
+  'DoS Slowhttptest': '#a855f7',
+  'DoS slowloris': '#8b5cf6',
+  'PortScan': '#3b82f6',
+  'Bot': '#06b6d4',
+  'FTP-Patator': '#14b8a6',
+  'SSH-Patator': '#22c55e',
+  'Web Attack Brute Force': '#ec4899',
+  'Web Attack XSS': '#f43f5e',
+  'Web Attack Sql Injection': '#e11d48',
+  'Heartbleed': '#be123c',
+  'Infiltration': '#9333ea',
+};
+
+// ── State ───────────────────────────────────────────────────────────────────
+let feedEntries = [];
+let ws = null;
+let reconnectTimer = null;
+
+// ── DOM refs ────────────────────────────────────────────────────────────────
+const $statusDot    = document.getElementById('statusDot');
+const $statusText   = document.getElementById('statusText');
+const $sessionRate  = document.getElementById('sessionRate');
+const $totalSess    = document.getElementById('totalSessions');
+const $totalFlows   = document.getElementById('totalFlows');
+const $accuracy     = document.getElementById('accuracy');
+const $dr           = document.getElementById('detectionRate');
+const $fpr          = document.getElementById('fpRate');
+const $feedBody     = document.getElementById('feedBody');
+const $feedCount    = document.getElementById('feedCount');
+const $barChart     = document.getElementById('barChart');
+const $attackTotal  = document.getElementById('attackTotal');
+const $cellTP       = document.getElementById('cellTP');
+const $cellFP       = document.getElementById('cellFP');
+const $cellFN       = document.getElementById('cellFN');
+const $cellTN       = document.getElementById('cellTN');
+const $intelBody    = document.getElementById('intelBody');
+const $intelMeta    = document.getElementById('intelMeta');
+
+// ── WebSocket ───────────────────────────────────────────────────────────────
+function connect() {
+  ws = new WebSocket(WS_URL);
+
+  ws.onopen = () => {
+    $statusDot.classList.add('connected');
+    $statusText.textContent = 'Connected — streaming live';
+    if (reconnectTimer) { clearInterval(reconnectTimer); reconnectTimer = null; }
+  };
+
+  ws.onclose = () => {
+    $statusDot.classList.remove('connected');
+    $statusText.textContent = 'Disconnected — reconnecting...';
+    if (!reconnectTimer) {
+      reconnectTimer = setInterval(() => { try { connect(); } catch(e) {} }, 3000);
+    }
+  };
+
+  ws.onerror = () => {};
+
+  ws.onmessage = (evt) => {
+    try {
+      const msg = JSON.parse(evt.data);
+      if (msg.type === 'detection') handleDetection(msg);
+      else if (msg.type === 'init') handleInit(msg);
+    } catch (e) { console.error('Parse error:', e); }
+  };
+}
+
+// ── Handlers ────────────────────────────────────────────────────────────────
+function handleInit(msg) {
+  if (msg.stats) updateStats(msg.stats);
+}
+
+function handleDetection(msg) {
+  updateStats(msg.stats);
+  addFeedEntry(msg);
+  updateBarChart(msg.stats.attack_counts);
+  if (msg.threat_intelligence) {
+    renderThreatIntel(msg);
+  }
+}
+
+function updateStats(s) {
+  $totalSess.textContent = s.total_sessions.toLocaleString();
+  $totalFlows.textContent = s.total_flows.toLocaleString() + ' flows';
+  $accuracy.textContent = (s.accuracy * 100).toFixed(1) + '%';
+  $dr.textContent = (s.detection_rate * 100).toFixed(1) + '%';
+  $fpr.textContent = (s.false_positive_rate * 100).toFixed(1) + '%';
+  $sessionRate.textContent = s.sessions_per_second + ' sess/s';
+
+  // Color accuracy
+  const acc = s.accuracy;
+  $accuracy.style.color = acc >= 0.9 ? 'var(--green)' : acc >= 0.7 ? 'var(--yellow)' : 'var(--red)';
+
+  // Confusion matrix
+  $cellTP.textContent = s.tp.toLocaleString();
+  $cellFP.textContent = s.fp.toLocaleString();
+  $cellFN.textContent = s.fn.toLocaleString();
+  $cellTN.textContent = s.tn.toLocaleString();
+}
+
+function addFeedEntry(msg) {
+  const p = msg.prediction;
+  const gt = msg.ground_truth;
+  const isAttack = p.is_attack;
+  const isCorrect = msg.correct;
+
+  const div = document.createElement('div');
+  div.className = `feed-entry ${isAttack ? 'attack' : 'benign'} ${isCorrect ? '' : 'wrong'}`;
+
+  // Session ID
+  const sidEl = document.createElement('div');
+  sidEl.className = 'sid';
+  sidEl.textContent = '#' + msg.session_id;
+
+  // Prediction + ground truth
+  const predEl = document.createElement('div');
+  predEl.className = 'pred';
+  const predColor = isAttack ? (ATTACK_COLORS[p.name] || 'var(--red)') : 'var(--green)';
+  predEl.innerHTML = `<span style="color:${predColor}">${escHtml(p.name)}</span>`;
+  // Show which detector ran when fallback is in use (anything other than C)
+  if (msg.config_used && msg.config_used !== 'C') {
+    const cfgColor = msg.config_used === 'HEURISTIC' ? 'var(--red)' : 'var(--orange)';
+    predEl.innerHTML += ` <span style="color:${cfgColor};font-size:10px;font-weight:700">[${escHtml(msg.config_used)}]</span>`;
+  }
+  if (gt.majority_name !== p.name) {
+    predEl.innerHTML += ` <span style="color:var(--text2);font-size:11px">GT: ${escHtml(gt.majority_name)}</span>`;
+  }
+
+  // Confidence
+  const confEl = document.createElement('div');
+  confEl.className = 'conf';
+  confEl.textContent = (p.confidence * 100).toFixed(1) + '%';
+
+  // Verdict
+  const verdEl = document.createElement('div');
+  verdEl.className = `verdict ${isCorrect ? 'correct' : 'wrong'}`;
+  verdEl.textContent = isCorrect ? 'CORRECT' : 'MISS';
+
+  div.appendChild(sidEl);
+  div.appendChild(predEl);
+  div.appendChild(confEl);
+  div.appendChild(verdEl);
+
+  $feedBody.insertBefore(div, $feedBody.firstChild);
+
+  feedEntries.unshift(div);
+  if (feedEntries.length > MAX_FEED_ENTRIES) {
+    const old = feedEntries.pop();
+    old.remove();
+  }
+  $feedCount.textContent = feedEntries.length + ' events';
+}
+
+function updateBarChart(attackCounts) {
+  if (!attackCounts) return;
+  const entries = Object.entries(attackCounts).sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) return;
+
+  const maxCount = entries[0][1];
+  let totalAttacks = entries.reduce((s, e) => s + e[1], 0);
+  $attackTotal.textContent = totalAttacks.toLocaleString() + ' attacks';
+
+  let html = '';
+  for (const [name, count] of entries) {
+    const pct = maxCount > 0 ? (count / maxCount * 100) : 0;
+    const color = ATTACK_COLORS[name] || 'var(--purple)';
+    html += `
+      <div class="bar-row">
+        <div class="bar-label">${escHtml(name)}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${pct}%; background:${color}"></div>
+        </div>
+        <div class="bar-count">${count}</div>
+      </div>`;
+  }
+  $barChart.innerHTML = html;
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+function renderList(items, max) {
+  if (!items || items.length === 0) {
+    return '<li style="color:var(--text2);font-style:italic">— none —</li>';
+  }
+  return items.slice(0, max || 5).map(x => `<li>${escHtml(x)}</li>`).join('');
+}
+
+function renderThreatIntel(msg) {
+  const ti = msg.threat_intelligence;
+  const p = msg.prediction;
+
+  const sev = (ti.severity || 'UNKNOWN').toUpperCase();
+  const sevClass = `sev-${sev}`;
+  const fp = (ti.fp_likelihood || '').toUpperCase();
+  const fpClass = fp ? `fp-${fp}` : '';
+
+  // Header meta line
+  $intelMeta.textContent = `session #${msg.session_id} · ${p.name} · ${(p.confidence * 100).toFixed(1)}% conf`;
+
+  const tactics = ti.mitre_tactics || [];
+  const techniques = ti.techniques || [];
+  const indicators = ti.zeek_indicators || [];
+  const actions = ti.response_actions || [];
+  const tags = ti.tags || [];
+
+  const groq = ti.groq_analysis;
+
+  let html = `
+    <div class="intel-grid">
+      <div class="intel-section" style="grid-column: 1 / 4">
+        <div class="intel-header">
+          <span class="intel-attack">${escHtml(p.name)}</span>
+          <span class="severity-badge ${sevClass}">${escHtml(sev)}</span>
+          ${fp ? `<span class="${fpClass}">FP: ${escHtml(fp)}</span>` : ''}
+          ${tags.map(t => `<span class="intel-tag">${escHtml(t)}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="intel-desc">
+        ${escHtml(ti.description || 'No description available.')}
+      </div>
+
+      <div class="intel-section">
+        <h4>MITRE ATT&amp;CK Tactics</h4>
+        <ul>${renderList(tactics, 6)}</ul>
+        <h4 style="margin-top:10px">Techniques</h4>
+        <ul>${renderList(techniques, 4)}</ul>
+      </div>
+
+      <div class="intel-section">
+        <h4>Zeek Indicators</h4>
+        <ul>${renderList(indicators, 5)}</ul>
+      </div>
+
+      <div class="intel-section">
+        <h4>Recommended Response</h4>
+        <ul>${renderList(actions, 5)}</ul>
+      </div>
+  `;
+
+  // Optional Groq LLM block
+  if (groq && (groq.threat_summary || groq.investigation_steps || groq.severity_context)) {
+    html += `<div class="groq-block">
+      <div class="groq-label">Groq LLM Analyst (llama-3.3-70b)</div>`;
+    if (groq.threat_summary) {
+      html += `<div style="margin-bottom:6px">${escHtml(groq.threat_summary)}</div>`;
+    }
+    if (groq.severity_context) {
+      html += `<div style="color:var(--text2);margin-bottom:6px"><strong>Context:</strong> ${escHtml(groq.severity_context)}</div>`;
+    }
+    if (ti.fp_reasoning) {
+      html += `<div style="color:var(--text2);margin-bottom:6px"><strong>FP Reasoning:</strong> ${escHtml(ti.fp_reasoning)}</div>`;
+    }
+    if (Array.isArray(groq.investigation_steps) && groq.investigation_steps.length) {
+      html += `<div style="margin-top:4px"><strong>Investigation Steps:</strong><ul style="margin-top:4px;padding-left:18px">`;
+      for (const s of groq.investigation_steps.slice(0, 5)) {
+        html += `<li style="font-size:11px;color:var(--text2);margin:2px 0">${escHtml(s)}</li>`;
+      }
+      html += `</ul></div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  $intelBody.innerHTML = html;
+}
+
+// ── Init ────────────────────────────────────────────────────────────────────
+connect();
+</script>
+</body>
+</html>
