@@ -43,3 +43,8 @@ The 27.8% streaming false-positive rate is documented and analysed rather than h
 Yogisha Paneru - Cybersecurity Analyst @ CoreDefense | CEH | MSc Cyber Security
 
 LinkedIn: https://www.linkedin.com/in/yogisha-paneru-5b592a16b/
+
+
+## Copyright
+
+Copyright (c) 2026 Yogisha Paneru. All rights reserved. This repository is shared publicly for portfolio and recruitment review. No permission is granted to copy, modify, redistribute, or present this work or its results as your own without the author's written consent. The dissertation this work is based on was submitted to the University of Hertfordshire.
