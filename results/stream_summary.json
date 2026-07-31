@@ -1,0 +1,20 @@
+{
+  "total_flows": 286467,
+  "total_attacks": 158930,
+  "total_benign": 127537,
+  "true_positives": 158926,
+  "false_positives": 539,
+  "false_negatives": 4,
+  "true_negatives": 126998,
+  "detection_rate": 1.0,
+  "false_positive_rate": 0.0042,
+  "flows_per_second": 13547.6,
+  "attack_counts": {
+    "Bot": 520,
+    "PortScan": 158899,
+    "Web Attack XSS": 2,
+    "DoS Hulk": 36,
+    "DoS Slowhttptest": 4,
+    "Web Attack Brute Force": 4
+  }
+}

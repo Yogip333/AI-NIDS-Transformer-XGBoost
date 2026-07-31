@@ -1,0 +1,318 @@
+{
+  "Config A": {
+    "Bot": {
+      "true_count": 85,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 0,
+      "fp_rate": 0.0
+    },
+    "DDoS": {
+      "true_count": 6431,
+      "detected_count": 3398,
+      "detection_rate": 0.5284,
+      "false_positives": 2773,
+      "fp_rate": 0.187378
+    },
+    "DoS GoldenEye": {
+      "true_count": 238,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 12,
+      "fp_rate": 0.000572
+    },
+    "DoS Hulk": {
+      "true_count": 10080,
+      "detected_count": 7135,
+      "detection_rate": 0.7078,
+      "false_positives": 3188,
+      "fp_rate": 0.285919
+    },
+    "DoS Slowhttptest": {
+      "true_count": 49,
+      "detected_count": 1,
+      "detection_rate": 0.0204,
+      "false_positives": 5,
+      "fp_rate": 0.000236
+    },
+    "DoS slowloris": {
+      "true_count": 29,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 0,
+      "fp_rate": 0.0
+    },
+    "FTP-Patator": {
+      "true_count": 61,
+      "detected_count": 1,
+      "detection_rate": 0.0164,
+      "false_positives": 0,
+      "fp_rate": 0.0
+    },
+    "PortScan": {
+      "true_count": 3963,
+      "detected_count": 2579,
+      "detection_rate": 0.6508,
+      "false_positives": 2041,
+      "fp_rate": 0.118202
+    },
+    "SSH-Patator": {
+      "true_count": 25,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 1,
+      "fp_rate": 4.7e-05
+    },
+    "Web Attack Brute Force": {
+      "true_count": 3,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 0,
+      "fp_rate": 0.0
+    },
+    "Web Attack XSS": {
+      "true_count": 1,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 0,
+      "fp_rate": 0.0
+    }
+  },
+  "Config B": {
+    "Bot": {
+      "true_count": 85,
+      "detected_count": 22,
+      "detection_rate": 0.2588,
+      "false_positives": 19,
+      "fp_rate": 0.000899
+    },
+    "DDoS": {
+      "true_count": 6431,
+      "detected_count": 5866,
+      "detection_rate": 0.9121,
+      "false_positives": 409,
+      "fp_rate": 0.027637
+    },
+    "DoS GoldenEye": {
+      "true_count": 238,
+      "detected_count": 191,
+      "detection_rate": 0.8025,
+      "false_positives": 34,
+      "fp_rate": 0.00162
+    },
+    "DoS Hulk": {
+      "true_count": 10080,
+      "detected_count": 9443,
+      "detection_rate": 0.9368,
+      "false_positives": 524,
+      "fp_rate": 0.046996
+    },
+    "DoS Slowhttptest": {
+      "true_count": 49,
+      "detected_count": 26,
+      "detection_rate": 0.5306,
+      "false_positives": 6,
+      "fp_rate": 0.000283
+    },
+    "DoS slowloris": {
+      "true_count": 29,
+      "detected_count": 17,
+      "detection_rate": 0.5862,
+      "false_positives": 5,
+      "fp_rate": 0.000236
+    },
+    "FTP-Patator": {
+      "true_count": 61,
+      "detected_count": 48,
+      "detection_rate": 0.7869,
+      "false_positives": 9,
+      "fp_rate": 0.000425
+    },
+    "PortScan": {
+      "true_count": 3963,
+      "detected_count": 3494,
+      "detection_rate": 0.8817,
+      "false_positives": 839,
+      "fp_rate": 0.04859
+    },
+    "SSH-Patator": {
+      "true_count": 25,
+      "detected_count": 10,
+      "detection_rate": 0.4,
+      "false_positives": 3,
+      "fp_rate": 0.000141
+    },
+    "Web Attack Brute Force": {
+      "true_count": 3,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 1,
+      "fp_rate": 4.7e-05
+    },
+    "Web Attack XSS": {
+      "true_count": 1,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 1,
+      "fp_rate": 4.7e-05
+    }
+  },
+  "Config C": {
+    "Bot": {
+      "true_count": 85,
+      "detected_count": 21,
+      "detection_rate": 0.2471,
+      "false_positives": 18,
+      "fp_rate": 0.000851
+    },
+    "DDoS": {
+      "true_count": 6431,
+      "detected_count": 5859,
+      "detection_rate": 0.9111,
+      "false_positives": 416,
+      "fp_rate": 0.02811
+    },
+    "DoS GoldenEye": {
+      "true_count": 238,
+      "detected_count": 191,
+      "detection_rate": 0.8025,
+      "false_positives": 40,
+      "fp_rate": 0.001905
+    },
+    "DoS Hulk": {
+      "true_count": 10080,
+      "detected_count": 9427,
+      "detection_rate": 0.9352,
+      "false_positives": 526,
+      "fp_rate": 0.047175
+    },
+    "DoS Slowhttptest": {
+      "true_count": 49,
+      "detected_count": 26,
+      "detection_rate": 0.5306,
+      "false_positives": 5,
+      "fp_rate": 0.000236
+    },
+    "DoS slowloris": {
+      "true_count": 29,
+      "detected_count": 17,
+      "detection_rate": 0.5862,
+      "false_positives": 5,
+      "fp_rate": 0.000236
+    },
+    "FTP-Patator": {
+      "true_count": 61,
+      "detected_count": 49,
+      "detection_rate": 0.8033,
+      "false_positives": 9,
+      "fp_rate": 0.000425
+    },
+    "PortScan": {
+      "true_count": 3963,
+      "detected_count": 3514,
+      "detection_rate": 0.8867,
+      "false_positives": 826,
+      "fp_rate": 0.047837
+    },
+    "SSH-Patator": {
+      "true_count": 25,
+      "detected_count": 10,
+      "detection_rate": 0.4,
+      "false_positives": 3,
+      "fp_rate": 0.000141
+    },
+    "Web Attack Brute Force": {
+      "true_count": 3,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 1,
+      "fp_rate": 4.7e-05
+    },
+    "Web Attack XSS": {
+      "true_count": 1,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 1,
+      "fp_rate": 4.7e-05
+    }
+  },
+  "Config D": {
+    "Bot": {
+      "true_count": 85,
+      "detected_count": 33,
+      "detection_rate": 0.3882,
+      "false_positives": 74,
+      "fp_rate": 0.0035
+    },
+    "DDoS": {
+      "true_count": 6431,
+      "detected_count": 5767,
+      "detection_rate": 0.8968,
+      "false_positives": 337,
+      "fp_rate": 0.022772
+    },
+    "DoS GoldenEye": {
+      "true_count": 238,
+      "detected_count": 222,
+      "detection_rate": 0.9328,
+      "false_positives": 90,
+      "fp_rate": 0.004287
+    },
+    "DoS Hulk": {
+      "true_count": 10080,
+      "detected_count": 9180,
+      "detection_rate": 0.9107,
+      "false_positives": 392,
+      "fp_rate": 0.035157
+    },
+    "DoS Slowhttptest": {
+      "true_count": 49,
+      "detected_count": 38,
+      "detection_rate": 0.7755,
+      "false_positives": 22,
+      "fp_rate": 0.001039
+    },
+    "DoS slowloris": {
+      "true_count": 29,
+      "detected_count": 22,
+      "detection_rate": 0.7586,
+      "false_positives": 17,
+      "fp_rate": 0.000802
+    },
+    "FTP-Patator": {
+      "true_count": 61,
+      "detected_count": 60,
+      "detection_rate": 0.9836,
+      "false_positives": 47,
+      "fp_rate": 0.00222
+    },
+    "PortScan": {
+      "true_count": 3963,
+      "detected_count": 3501,
+      "detection_rate": 0.8834,
+      "false_positives": 949,
+      "fp_rate": 0.05496
+    },
+    "SSH-Patator": {
+      "true_count": 25,
+      "detected_count": 18,
+      "detection_rate": 0.72,
+      "false_positives": 16,
+      "fp_rate": 0.000755
+    },
+    "Web Attack Brute Force": {
+      "true_count": 3,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 3,
+      "fp_rate": 0.000141
+    },
+    "Web Attack XSS": {
+      "true_count": 1,
+      "detected_count": 0,
+      "detection_rate": 0.0,
+      "false_positives": 4,
+      "fp_rate": 0.000188
+    }
+  }
+}

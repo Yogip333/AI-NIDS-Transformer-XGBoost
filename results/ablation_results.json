@@ -1,0 +1,35 @@
+{
+  "10-flow": {
+    "accuracy": 0.6137070183702308,
+    "f1_weighted": 0.6363405166902618,
+    "f1_macro": 0.2841097585019066,
+    "precision_weighted": 0.6745607334426583,
+    "recall_weighted": 0.6137070183702308,
+    "auc_weighted": 0.7954646145090097,
+    "n_samples": 21230,
+    "n_attacks": 20965,
+    "n_benign": 265
+  },
+  "20-flow": {
+    "accuracy": 0.9092322185586434,
+    "f1_weighted": 0.9088689468603685,
+    "f1_macro": 0.6045426702636588,
+    "precision_weighted": 0.9098413666897066,
+    "recall_weighted": 0.9092322185586434,
+    "auc_weighted": 0.987497827340711,
+    "n_samples": 21230,
+    "n_attacks": 20965,
+    "n_benign": 265
+  },
+  "50-flow": {
+    "accuracy": 0.9092322185586434,
+    "f1_weighted": 0.9088689468603685,
+    "f1_macro": 0.6045426702636588,
+    "precision_weighted": 0.9098413666897066,
+    "recall_weighted": 0.9092322185586434,
+    "auc_weighted": 0.987497827340711,
+    "n_samples": 21230,
+    "n_attacks": 20965,
+    "n_benign": 265
+  }
+}

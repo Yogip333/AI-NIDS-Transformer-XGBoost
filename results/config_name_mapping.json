@@ -1,0 +1,39 @@
+{
+  "_description": "Canonical mapping between thesis config labels, internal HybridIDS ids, and model artifacts.",
+  "Config A": {
+    "description": "XGBoost on statistical features only (baseline)",
+    "internal_id": "a",
+    "hybrid_attr": "xgb_a",
+    "model_file": "xgb_stat_only.joblib",
+    "accuracy": "61.93%",
+    "shap_eligible": true,
+    "attention_eligible": false
+  },
+  "Config B": {
+    "description": "XGBoost on 256-dim Transformer embeddings",
+    "internal_id": "b",
+    "hybrid_attr": "xgb_b",
+    "model_file": "xgb_embed_only.joblib",
+    "accuracy": "90.94%",
+    "shap_eligible": true,
+    "attention_eligible": false
+  },
+  "Config C": {
+    "description": "XGBoost on Transformer embeddings + statistical features (full hybrid)",
+    "internal_id": "c",
+    "hybrid_attr": "xgb_c",
+    "model_file": "xgb_hybrid.joblib",
+    "accuracy": "90.94%",
+    "shap_eligible": true,
+    "attention_eligible": false,
+    "primary_serving_detector": true
+  },
+  "Config D": {
+    "description": "Transformer classifier (CLS token → MLP head)",
+    "internal_id": "standalone",
+    "model_file": "classifier_final.pt",
+    "accuracy": "89.86%",
+    "shap_eligible": false,
+    "attention_eligible": true
+  }
+}

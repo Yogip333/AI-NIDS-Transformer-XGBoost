@@ -1,0 +1,106 @@
+[
+  {
+    "feature": "stat_std_flow_iat",
+    "importance": 0.465019553899765
+  },
+  {
+    "feature": "stat_idle_active_ratio",
+    "importance": 0.3411363363265991
+  },
+  {
+    "feature": "stat_std_bytes_per_flow",
+    "importance": 0.31251493096351624
+  },
+  {
+    "feature": "stat_log_type_entropy",
+    "importance": 0.2922244071960449
+  },
+  {
+    "feature": "stat_avg_win_size",
+    "importance": 0.2831091582775116
+  },
+  {
+    "feature": "stat_total_bwd_bytes",
+    "importance": 0.26963528990745544
+  },
+  {
+    "feature": "stat_port_entropy",
+    "importance": 0.2473500818014145
+  },
+  {
+    "feature": "stat_avg_pkts_per_flow",
+    "importance": 0.2401379942893982
+  },
+  {
+    "feature": "stat_pkt_ratio",
+    "importance": 0.23278501629829407
+  },
+  {
+    "feature": "stat_bytes_ratio",
+    "importance": 0.22033151984214783
+  },
+  {
+    "feature": "stat_urg_ratio",
+    "importance": 0.203743115067482
+  },
+  {
+    "feature": "stat_std_duration",
+    "importance": 0.19911010563373566
+  },
+  {
+    "feature": "stat_avg_flow_iat",
+    "importance": 0.19771459698677063
+  },
+  {
+    "feature": "stat_avg_duration",
+    "importance": 0.19194529950618744
+  },
+  {
+    "feature": "stat_avg_flow_bps",
+    "importance": 0.18480245769023895
+  },
+  {
+    "feature": "stat_psh_ratio",
+    "importance": 0.181232750415802
+  },
+  {
+    "feature": "stat_max_flow_bps",
+    "importance": 0.1712370663881302
+  },
+  {
+    "feature": "stat_std_pkts_per_flow",
+    "importance": 0.16897577047348022
+  },
+  {
+    "feature": "stat_total_fwd_bytes",
+    "importance": 0.16640248894691467
+  },
+  {
+    "feature": "stat_short_flow_ratio",
+    "importance": 0.14197762310504913
+  },
+  {
+    "feature": "stat_avg_bytes_per_flow",
+    "importance": 0.13963711261749268
+  },
+  {
+    "feature": "stat_unique_dst_ports",
+    "importance": 0.1334262192249298
+  },
+  {
+    "feature": "stat_syn_ratio",
+    "importance": 0.1302310824394226
+  },
+  {
+    "feature": "stat_fin_ratio",
+    "importance": 0.1219424456357956
+  },
+  {
+    "feature": "stat_rst_ratio",
+    "importance": 0.00044536549830809236
+  },
+  {
+    "feature": "stat_flow_count",
+    "importance": 0.0
+  }
+]

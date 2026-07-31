@@ -1,0 +1,82 @@
+[
+  {
+    "feature": "emb_253",
+    "importance": 0.07205456495285034
+  },
+  {
+    "feature": "emb_188",
+    "importance": 0.06200677528977394
+  },
+  {
+    "feature": "emb_15",
+    "importance": 0.06062765419483185
+  },
+  {
+    "feature": "emb_41",
+    "importance": 0.06041542440652847
+  },
+  {
+    "feature": "emb_246",
+    "importance": 0.05327681452035904
+  },
+  {
+    "feature": "emb_179",
+    "importance": 0.05064747855067253
+  },
+  {
+    "feature": "emb_103",
+    "importance": 0.045589230954647064
+  },
+  {
+    "feature": "emb_147",
+    "importance": 0.044260475784540176
+  },
+  {
+    "feature": "emb_52",
+    "importance": 0.04214859381318092
+  },
+  {
+    "feature": "emb_13",
+    "importance": 0.04151459038257599
+  },
+  {
+    "feature": "emb_9",
+    "importance": 0.039829935878515244
+  },
+  {
+    "feature": "emb_183",
+    "importance": 0.0392029844224453
+  },
+  {
+    "feature": "emb_125",
+    "importance": 0.035617854446172714
+  },
+  {
+    "feature": "emb_153",
+    "importance": 0.03471238166093826
+  },
+  {
+    "feature": "emb_17",
+    "importance": 0.03385963663458824
+  },
+  {
+    "feature": "emb_1",
+    "importance": 0.03373626247048378
+  },
+  {
+    "feature": "emb_18",
+    "importance": 0.03065013512969017
+  },
+  {
+    "feature": "emb_7",
+    "importance": 0.029826326295733452
+  },
+  {
+    "feature": "emb_44",
+    "importance": 0.02980297990143299
+  },
+  {
+    "feature": "emb_20",
+    "importance": 0.02978542074561119
+  }
+]
