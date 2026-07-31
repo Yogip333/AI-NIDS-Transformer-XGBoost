@@ -1,0 +1,229 @@
+project:
+  name: "AI-NIDS"
+  version: "2.0.0"
+  description: "Hybrid ML IDS with RAG Threat Intelligence"
+
+paths:
+  data_dir: "Kaggle Dataset"
+  processed_dir: "data/processed"
+  models_dir: "models/checkpoints"
+  logs_dir: "logs"
+  rag_db_dir: "data/rag_db"
+
+data:
+  # CIC-IDS2017 CSV files
+  csv_files:
+    - "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv"
+    - "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv"
+    - "Friday-WorkingHours-Morning.pcap_ISCX.csv"
+    - "Monday-WorkingHours.pcap_ISCX.csv"
+    - "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv"
+    - "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv"
+    - "Tuesday-WorkingHours.pcap_ISCX.csv"
+    - "Wednesday-workingHours.pcap_ISCX.csv"
+
+  # Label column name
+  label_column: " Label"
+
+  # Sampling for development (null = use all data)
+  max_rows_per_file: null  # Set to e.g. 50000 for faster dev runs
+
+  # Train/val/test split ratios
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+
+  # Session window size (number of flows per session)
+  session_size: 20
+
+  # Overlapping stride — more training sessions, better coverage
+  session_stride: 10
+
+  # Session window ablation values
+  session_sizes_ablation: [10, 20, 50]
+
+  # Reproducibility seed - makes operation consistent across runs
+  random_seed: 42
+
+# Feature configuration
+features:
+  # Selected numerical features from CIC-IDS2017
+  numerical_features:
+    - " Destination Port"
+    - " Flow Duration"
+    - " Total Fwd Packets"
+    - " Total Backward Packets"
+    - "Total Length of Fwd Packets"
+    - " Total Length of Bwd Packets"
+    - " Fwd Packet Length Max"
+    - " Fwd Packet Length Min"
+    - " Fwd Packet Length Mean"
+    - " Fwd Packet Length Std"
+    - "Bwd Packet Length Max"
+    - " Bwd Packet Length Mean"
+    - " Bwd Packet Length Std"
+    - "Flow Bytes/s"
+    - " Flow Packets/s"
+    - " Flow IAT Mean"
+    - " Flow IAT Std"
+    - " Flow IAT Max"
+    - " Flow IAT Min"
+    - "Fwd IAT Total"
+    - " Fwd IAT Mean"
+    - " Fwd IAT Std"
+    - " Fwd IAT Max"
+    - " Fwd IAT Min"
+    - "Bwd IAT Total"
+    - " Bwd IAT Mean"
+    - " Bwd IAT Std"
+    - " Bwd IAT Max"
+    - " Bwd IAT Min"
+    - "Fwd PSH Flags"
+    - " Bwd PSH Flags"
+    - " Fwd URG Flags"
+    - " Bwd URG Flags"
+    - "Fwd Packets/s"
+    - " Bwd Packets/s"
+    - " Min Packet Length"
+    - " Max Packet Length"
+    - " Packet Length Mean"
+    - " Packet Length Std"
+    - " Packet Length Variance"
+    - "FIN Flag Count"
+    - " SYN Flag Count"
+    - " RST Flag Count"
+    - " PSH Flag Count"
+    - " ACK Flag Count"
+    - " URG Flag Count"
+    - " CWE Flag Count"
+    - " ECE Flag Count"
+    - " Down/Up Ratio"
+    - " Average Packet Size"
+    - " Avg Fwd Segment Size"
+    - " Avg Bwd Segment Size"
+    - "Fwd Avg Bytes/Bulk"
+    - " Fwd Avg Packets/Bulk"
+    - " Fwd Avg Bulk Rate"
+    - " Bwd Avg Bytes/Bulk"
+    - " Bwd Avg Packets/Bulk"
+    - "Bwd Avg Bulk Rate"
+    - "Subflow Fwd Packets"
+    - " Subflow Fwd Bytes"
+    - " Subflow Bwd Packets"
+    - " Subflow Bwd Bytes"
+    - "Init_Win_bytes_forward"
+    - " Init_Win_bytes_backward"
+    - " act_data_pkt_fwd"
+    - " min_seg_size_forward"
+    - "Active Mean"
+    - " Active Std"
+    - " Active Max"
+    - " Active Min"
+    - "Idle Mean"
+    - " Idle Std"
+    - " Idle Max"
+    - " Idle Min"
+
+  # Statistical features count (computed per session)
+  num_stat_features: 26
+
+# Per-flow XGBoost (PRIMARY detector — targets 95-98% accuracy)
+xgboost_flow:
+  n_estimators: 500
+  max_depth: 10
+  learning_rate: 0.05
+  subsample: 0.8
+  colsample_bytree: 0.8
+  min_child_weight: 5
+  gamma: 0.1
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  use_gpu: true
+  early_stopping_rounds: 30
+
+# Transformer model hyperparameters (session-level detector)
+transformer:
+  d_model: 256
+  nhead: 8
+  num_encoder_layers: 4
+  dim_feedforward: 512
+  dropout: 0.1
+  max_seq_len: 60
+  log_type_embed_dim: 32
+  use_amp: true            # mixed precision for RTX 3050 6GB
+
+# Pre-training configuration
+pretraining:
+  mask_prob: 0.15
+  learning_rate: 0.0001
+  batch_size: 256
+  num_epochs: 15
+  warmup_steps: 500
+  scheduler: "cosine"
+  grad_clip: 1.0
+  early_stopping_patience: 3
+
+# Fine-tuning configuration
+finetuning:
+  learning_rate: 0.00005
+  batch_size: 128
+  num_epochs: 40
+  warmup_steps: 200
+  scheduler: "cosine"
+  grad_clip: 1.0
+  early_stopping_patience: 7
+  class_weights: true  # Handle class imbalance
+  focal_gamma: 3.0  # Focal Loss gamma (Lin et al., 2018)
+
+# Session-level XGBoost (hybrid ensemble with Transformer embeddings)
+xgboost:
+  n_estimators: 300
+  max_depth: 8
+  learning_rate: 0.1
+  subsample: 0.8
+  colsample_bytree: 0.8
+  min_child_weight: 3
+  gamma: 0.1
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  use_gpu: true
+
+# Streaming / CSV replay
+streaming:
+  batch_size: 100
+  rate_limit: 0         # 0 = unlimited, N = flows/second
+  default_model: "flow_xgb"  # flow_xgb | session_hybrid
+
+# RAG configuration
+rag:
+  embedding_model: "nomic-ai/nomic-embed-text-v1.5"
+  collection_name: "threat_intelligence"
+  top_k: 5
+  similarity_threshold: 0.7
+  chunk_size: 512
+  chunk_overlap: 64
+
+# API configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins: ["*"]
+  max_flows_per_request: 1000
+
+# Label mapping
+labels:
+  BENIGN: 0
+  Bot: 1
+  DDoS: 2
+  "DoS GoldenEye": 3
+  "DoS Hulk": 4
+  "DoS Slowhttptest": 5
+  "DoS slowloris": 6
+  "FTP-Patator": 7
+  Heartbleed: 8
+  Infiltration: 9
+  PortScan: 10
+  "SSH-Patator": 11
+  "Web Attack Brute Force": 12
+  "Web Attack Sql Injection": 13
+  "Web Attack XSS": 14
